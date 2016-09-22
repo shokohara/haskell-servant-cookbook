@@ -116,7 +116,7 @@ executable persistent
                      , resourcet
                      , transformers
                      , persistent
-                     , persistent-mysql
+                     , persistent-postgresql
                      , persistent-template
                      , servant
                      , servant-server

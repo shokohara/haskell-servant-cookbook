@@ -20,10 +20,7 @@ import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified Data.Text.IO                 as T
 import           Database.Persist
-import           Database.Persist.MySQL       (ConnectInfo (..),
-                                               SqlBackend (..),
-                                               defaultConnectInfo, runMigration,
-                                               runSqlPool, withMySQLConn)
+import           Database.Persist.Postgresql
 import           Database.Persist.Sql         (SqlPersistT, runSqlConn)
 import           Database.Persist.TH          (mkMigrate, mkPersist,
                                                persistLowerCase, share,
@@ -52,14 +49,14 @@ helloApi = Proxy
 app :: Application
 app = serve helloApi server
 
-runDB :: ConnectInfo -> SqlPersistT (ResourceT (NoLoggingT IO)) a -> IO a
-runDB info = runNoLoggingT . runResourceT . withMySQLConn info . runSqlConn
 
-connInfo :: ConnectInfo
-connInfo = defaultConnectInfo { connectUser = "test", connectPassword = "secret", connectDatabase = "servant_persistent" }
+connStr = "host=localhost dbname=test user=test password=test port=5432"
+
+--runDB :: ConnectInfo -> SqlPersistT (ResourceT (NoLoggingT IO)) a -> IO a
+runDB info = runNoLoggingT . runResourceT . withPostgresqlPool connStr 10 . runSqlConn
 
 doMigration :: IO ()
-doMigration = runNoLoggingT $ runResourceT $ withMySQLConn connInfo $ runReaderT $ runMigration migrateAll
+doMigration = print "doMigration"
 
 server :: Server HelloAPI
 server = getUsers :<|> postUser
